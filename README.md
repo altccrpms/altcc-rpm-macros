@@ -28,7 +28,6 @@ Emits %dir ownership of the install tree.  Takes a list of directories, e.g.:
 ```
 %{?altcc:%altcc_files %{_bindir} %{_libdir} %{_mandir} %{_mandir}/man1}
 ```
-/pre>
 Add a "-m" option to the package that contains the module file.  This is generally the main package unless there is a -libs sub-package.
 
 ## altcc_with_mpi
