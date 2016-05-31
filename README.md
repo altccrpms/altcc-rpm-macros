@@ -11,6 +11,15 @@ Expands to a suffix containing the version of the main package, the name and ver
 Name: %{shortname}%{?altcc_pkg_suffix}
 ```
 
+## altcc_name_suffix
+Expands to a suffix containing the version of the main package, and the name and version of the compiler used.  Add %{?altcc_name_suffix} to Name of packages as an alternative to %{?altcc_pkg_suffix} that do not have MPI versions.  Not strictly necessary if the package is not built with an MPI module loaded.
+
+## altcc_dep_suffix
+Expands to a suffix containting the name and version of the compiler, and the name and version of the MPI library used if applicable.  Add %{?altcc_dep_suffix} to the name of any dependencies that have altcc versions.
+
+## altcc_cc_dep_suffix
+Expands to a suffix containting the name and version of the compiler used.  Add %{?altcc_cc_dep_suffix} to the name of any dependencies that have altcc versions, but no MPI versions.
+
 ## altcc
 True if building in AltCCRPM mode (COMPILER_NAME set).  False otherwise.  Use to conditionalize the spec, e.g.: `%{!?altcc:BuildRequires: gcc-fortran}` or `%{?altcc:module load hdf5}`
 
@@ -30,5 +39,11 @@ Emits %dir ownership of the install tree.  Takes a list of directories, e.g.:
 ```
 Add a "-m" option to the package that contains the module file.  This is generally the main package unless there is a -libs sub-package.
 
+## altcc_reqmpi
+Expands to a requires on the current version of the MPI development package.  Add to -devel pacakges.
+
 ## altcc_with_mpi
 True if buildwith with MPI, false if not.
+
+## altcc_cc_name
+Same as $COMPILER_NAME

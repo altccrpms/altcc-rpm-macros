@@ -42,7 +42,6 @@
     rpm.define("altcc_name_suffix "..altcc_name_suffix);
     rpm.define("altcc_dep_suffix "..altcc_dep_suffix);
     rpm.define("altcc_pkg_suffix "..altcc_pkg_suffix);
-    rpm.define("altcc_modulefiledir "..altcc_modulefiledir);
     rpm.define("_prefix "..altcc_prefix);
     rpm.define("_sysconfdir "..altcc_prefix.."/etc");
     print(rpm.expand("%undefine _missing_build_ids_terminate_build"));
