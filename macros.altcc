@@ -1,0 +1,124 @@
+# Macros for AltCCRPMs
+
+# Initialize AltCCRPMs - called from the start of the spec file
+%altcc_init(n:v:m) %{lua:
+  altcc_name = rpm.expand("%{-n*}");
+  local version = rpm.expand("%{-v*}");
+  local name_ver = altcc_name.."-"..version;
+  altcc_cc_name = os.getenv("COMPILER_NAME");
+  if (altcc_cc_name == nil) then
+    altcc_cc_name = ""
+  end
+  altcc_modulepath = nil;
+  if (altcc_cc_name ~= "") then
+    altcc = true;
+    rpm.define("altcc 1");
+    rpm.define("altcc_cc_name "..altcc_cc_name);
+    altcc_cc_version = os.getenv("COMPILER_VERSION");
+    altcc_cc_name_ver = altcc_cc_name.."-"..altcc_cc_version;
+    rpm.define("altcc_cc_dep_suffix -"..altcc_cc_name_ver);
+    altcc_mpi_name = os.getenv("MPI_NAME");
+    if (altcc_mpi_name == nil or altcc_mpi_name == "") then
+      rpm.define("altcc_with_mpi 0");
+      altcc_name_suffix = "-"..altcc_cc_name;
+      altcc_dep_suffix = "-"..altcc_cc_name_ver;
+      altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver;
+      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_name.."-"..version;
+      altcc_modulefiledir = "/opt/modulefiles/Compiler/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name;
+      -- If we are an MPI implementation
+      if (rpm.expand("%{-m}") ~= "") then
+        altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..version;
+      end
+    else
+      rpm.define("altcc_with_mpi 1");
+      altcc_mpi_version = os.getenv("MPI_VERSION");
+      altcc_mpi_name_ver = altcc_mpi_name.."-"..altcc_mpi_version;
+      altcc_name_suffix = "-"..altcc_cc_name.."-"..altcc_mpi_name;
+      altcc_dep_suffix = "-"..altcc_cc_name_ver.."-"..altcc_mpi_name_ver;
+      altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver.."-"..altcc_mpi_name_ver;
+      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..name_ver;
+      altcc_modulefiledir = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_mpi_name.."/"..altcc_mpi_version.."/"..altcc_name;
+    end
+    rpm.define("altcc_name_suffix "..altcc_name_suffix);
+    rpm.define("altcc_dep_suffix "..altcc_dep_suffix);
+    rpm.define("altcc_pkg_suffix "..altcc_pkg_suffix);
+    rpm.define("altcc_modulefiledir "..altcc_modulefiledir);
+    rpm.define("_prefix "..altcc_prefix);
+    rpm.define("_sysconfdir "..altcc_prefix.."/etc");
+    print(rpm.expand("%undefine _missing_build_ids_terminate_build"));
+  else
+    altcc = false;
+  end
+}
+
+# Emit version-less provides for easy installation of latest version
+%altcc_provide(n:) %{lua:
+  if (not altcc) then
+    return
+  end
+  local name = rpm.expand("%{-n*}");
+  if (name == "") then
+    name = altcc_name;
+  end
+  local suffix = rpm.expand("%{?1:%{1}}");
+  if (suffix ~= "" and string.sub(suffix,1,1) ~= "-") then
+    suffix = "-"..suffix
+  end
+  print("Provides: "..name..altcc_name_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n");
+  print("Provides: "..name..altcc_name_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n");
+  print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n");
+  print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n");
+}
+
+# Emit the requires on environment(modules) - called from the package that
+# the modulefile
+%altcc_reqmodules() %{lua:
+  if (altcc) then
+    print("Requires:       environment(modules)\\n");
+  end
+}
+
+# Emit the requires the mpi devel package if needed - called from devel packages
+%altcc_reqmpi() %{lua:
+  if (altcc and altcc_mpi_name_ver ~= nil) then
+    print("Requires: "..altcc_mpi_name_ver.."-"..altcc_cc_name_ver..rpm.expand("-devel%{?_isa}\\n"));
+  end
+}
+
+# Make the environment-modules file - must be given the source of the file
+%altcc_writemodule() %{lua:
+  if (not altcc) then
+    return
+  end
+  print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulefiledir.."\\n");
+  print(rpm.expand("sed -e 's#@PREFIX@#%{_prefix}#g;s#@LIB@#%{_lib}#g;s#@LIBDIR@#%{_libdir}#g;s#@ETCDIR@#%{_sysconfdir}#g;s#@FMODDIR@#%{_libdir}#g;s#@INCDIR@#%{_includedir}#g;s#@MANDIR@#%{_mandir}#g;s#@DATADIR@#%{_datadir}#g;\\n"));
+  if (altcc_modulepath ~= nil) then
+    print("s#@MODULEPATH@#"..altcc_modulepath.."#;\\n");
+  end
+  print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}%{altcc_modulefiledir}/%{version}\\n"));
+  if (altcc_modulepath ~= nil) then
+    print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath.."\\n");
+  end
+}
+
+# Emit %files entries to own the prefix and any other directories given.  Add -m
+# option for package containing the module file
+%altcc_files(m) %{lua:
+  if (not altcc) then
+    return
+  end
+  if (rpm.expand("%{-m}") ~= "") then
+    print("%dir "..altcc_prefix.."\\n");
+  end
+  local arg
+  local args = rpm.expand('%*')
+  for arg in args:gmatch('%S+') do
+    print("%dir "..rpm.expand(arg).."\\n");
+  end
+  if (rpm.expand("%{-m}") ~= "") then
+    print(altcc_modulefiledir.."\\n");
+    if (altcc_modulepath ~= nil) then
+      print("/opt/modulefiles/MPI\\n");
+    end
+  end
+}
