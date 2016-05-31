@@ -17,7 +17,7 @@ True if building in AltCCRPM mode (COMPILER_NAME set).  False otherwise.  Use to
 ## altcc_reqmodules
 Expands to `Requires: environment(modules)`.  Add to the package that contains the environment module file if needed.
 
-## altcc_prvide
+## altcc_provide
 Expands to version-less provides for ease of installing the latest version of a package, e.g. install hdf5-intel-openmpi.  Add to each package definition.  Takes a sub-package name as an arguement and can take -n option change the base package name.  Usage: `%?altcc_provide` or `%{?altcc:%altcc_provide [-n name] [name]}`
 
 ## altcc_writemodule
