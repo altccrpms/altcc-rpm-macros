@@ -19,7 +19,7 @@ This package contains the RPM macros for the AltCCRPMs project.
 
 %install
 mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
-install -m 644 %{SOURCE0} %{buildroot}/%{_rpmconfigdir}/macros.d/
+install -pm 644 macros.altcc %{buildroot}/%{_rpmconfigdir}/macros.d/
 
 %files
 %license LICENSE
