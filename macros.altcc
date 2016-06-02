@@ -94,7 +94,7 @@
   if (altcc_modulepath ~= nil) then
     print("s#@MODULEPATH@#"..altcc_modulepath.."#;\\n");
   end
-  print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}%{altcc_modulefiledir}/%{version}\\n"));
+  print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}"..altcc_modulefiledir.."/%{version}\\n"));
   if (altcc_modulepath ~= nil) then
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath.."\\n");
   end
@@ -102,6 +102,7 @@
 
 # Emit %files entries to own the prefix and any other directories given.  Add -m
 # option for package containing the module file
+# TODO - fill in paths
 %altcc_files(m) %{lua:
   if (not altcc) then
     return
