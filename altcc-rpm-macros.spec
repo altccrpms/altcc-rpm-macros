@@ -1,5 +1,5 @@
 Name:           altcc-rpm-macros
-Version:        1
+Version:        2
 Release:        1%{?dist}
 Summary:        AltCCRPMs rpm macros
 URL:            https://github.com/altccrpms/altcc-rpm-macros
@@ -27,5 +27,8 @@ install -pm 644 macros.altcc %{buildroot}/%{_rpmconfigdir}/macros.d/
 %{_rpmconfigdir}/macros.d/macros.altcc
 
 %changelog
+* Thu Jun 2 2016 Orion Poplawski <orion@cora.nwra.com> - 2-1
+- Fix usage of altcc_modulefiledir
+
 * Tue May 31 2016 Orion Poplawski <orion@cora.nwra.com> - 1-1
 - Initial package
