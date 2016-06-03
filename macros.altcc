@@ -100,25 +100,63 @@
   end
 }
 
-# Emit %files entries to own the prefix and any other directories given.  Add -m
-# option for package containing the module file
-# TODO - fill in paths
-%altcc_files(m) %{lua:
+# Create the doc directory
+%altcc_doc() %{lua:
+  if (altcc) then
+    print("mkdir -p "..rpm.expand("%{buildroot}/%{_defaultdocdir}\\n"))
+  end
+}
+
+# Create the license directory
+%altcc_license() %{lua:
+  if (altcc) then
+    print("mkdir -p "..rpm.expand("%{buildroot}/%{_licensedir}\\n"))
+  end
+}
+
+# Emit %files entries to own the prefix and any other directories given.
+# Add -d option for package(s) containing a %doc file.
+# Add -l option for package(s) containing a %license file.
+# Add -m option for package containing the module file.
+%altcc_files(dlm) %{lua:
   if (not altcc) then
     return
   end
+  -- Package with the module file is considered primary and owns %_prefix
   if (rpm.expand("%{-m}") ~= "") then
-    print("%dir "..altcc_prefix.."\\n");
+    print("%dir "..altcc_prefix.."\\n")
   end
   local arg
+  local files = {}
+  local prefix_len = string.len(altcc_prefix)
   local args = rpm.expand('%*')
+  if (rpm.expand("%{-d}") ~= "") then
+    args = args.." "..rpm.expand("%{_defaultdocdir}")
+  end
+  if (rpm.expand("%{-l}") ~= "") then
+    args = args.." "..rpm.expand("%{_licensedir}")
+  end
   for arg in args:gmatch('%S+') do
-    print("%dir "..rpm.expand(arg).."\\n");
+    local f = rpm.expand(arg)
+    files[f] = true
+    -- Own parent directories if in prefix
+    if string.sub(f,1,prefix_len) == altcc_prefix then
+      local subdirs =  string.sub(f,prefix_len+1,-1)
+      local dir = altcc_prefix
+      for item in subdirs:gmatch('[^/]+') do
+        dir = dir.."/"..item
+        if files[dir] == nil then
+          files[dir] = true
+          print("%dir "..dir.."\\n")
+        end
+      end
+    end
+    print("%dir "..f.."\\n")
   end
   if (rpm.expand("%{-m}") ~= "") then
-    print(altcc_modulefiledir.."\\n");
+    print(altcc_modulefiledir.."\\n")
     if (altcc_modulepath ~= nil) then
-      print("/opt/modulefiles/MPI\\n");
+      print("/opt/modulefiles/MPI\\n")
     end
   end
 }

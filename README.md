@@ -32,12 +32,21 @@ Expands to version-less provides for ease of installing the latest version of a 
 ## altcc_writemodule
 Used in %install to write the environment module from the source.  Takes the source as an argument: `%{?altcc:%altcc_writemodule %SOURCE2}`
 
+## altcc_doc
+Used in %install to create %{_defaultdocdir}.  May be needed for proper directory ownership in files with -d option to %altcc_files
+
+## altcc_license
+Used in %install to create %{_licensedir}.  Needed for proper directory ownership in files with -l option to %altcc_files
+
 ## altcc_files
 Emits %dir ownership of the install tree.  Takes a list of directories, e.g.:
 ```
-%{?altcc:%altcc_files %{_bindir} %{_libdir} %{_mandir} %{_mandir}/man1}
+%{?altcc:%altcc_files -lm %{_bindir} %{_libdir} %{_mandir}/man1}
 ```
+Add a "-d" option to the package(s) that contain %doc files.  You may need to also call %{?altcc:%altcc_doc} in %install.
+Add a "-l" option to the package(s) that contain %license files.  Be sure to also call %{?altcc:%altcc_license} in %install.
 Add a "-m" option to the package that contains the module file.  This is generally the main package unless there is a -libs sub-package.
+Only the unique leaf trees need to be specified.  Directories between the install prefix and the given directories will be owned automatically as well.
 
 ## altcc_reqmpi
 Expands to a requires on the current version of the MPI development package.  Add to -devel pacakges.
