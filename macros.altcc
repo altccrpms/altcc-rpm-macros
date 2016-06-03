@@ -2,8 +2,24 @@
 
 # Initialize AltCCRPMs - called from the start of the spec file
 %altcc_init(n:v:m) %{lua:
-  altcc_name = rpm.expand("%{-n*}")
-  local version = rpm.expand("%{-v*}")
+  altcc_name = ""
+  if (rpm.expand("%{-n}") ~= "") then
+    altcc_name = rpm.expand("%{-n*}")
+  else
+    altcc_name = rpm.expand("%{?shortname}")
+  end
+  if (altcc_name == "") then
+    print("%altcc_init: ERROR: Need to pass name with -n or define %shortname!")
+  end
+  local version = ""
+  if (rpm.expand("%{-v}") ~= "") then
+    version = rpm.expand("%{-v*}")
+  else
+    version = rpm.expand("%{?ver}")
+  end
+  if (version == "") then
+    print("%altcc_init: ERROR: Need to pass version with -v or define %ver!")
+  end
   local name_ver = altcc_name.."-"..version
   altcc_cc_name = os.getenv("COMPILER_NAME")
   if (altcc_cc_name == nil) then

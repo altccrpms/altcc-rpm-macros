@@ -3,7 +3,16 @@ RPM macros for creating AltCCRPM packages.  The macros are:
 
 ## altcc_init
 Intializes the AltCCRPM macros.  Call before Name.
-Usage: `%{?altcc_init:altcc_init -n %{shortname} -v %{ver}}`
+Usage:
+```
+%{?altcc_init:altcc_init -n <name> -v <version>}
+```
+or
+```
+%global shortname <name>
+%global ver <version>
+%{?altcc_init}
+```
 
 ## altcc_pkg_suffix
 Expands to a suffix containing the version of the main package, the name and version of the compiler, and the name and version of the MPI library used if applicable.  Add %{?altcc_pkg_suffix} to Name.

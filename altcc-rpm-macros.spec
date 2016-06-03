@@ -30,6 +30,7 @@ install -pm 644 macros.altcc %{buildroot}/%{_rpmconfigdir}/macros.d/
 * Fri Jun 3 2016 Orion Poplawski <orion@cora.nwra.com> - 3-1
 - Add handling of %%doc and %%license
 - Automatically own parent directories
+- Allow %%altcc_init to use %%shortname and %%ver directly
 
 * Thu Jun 2 2016 Orion Poplawski <orion@cora.nwra.com> - 2-1
 - Fix usage of altcc_modulefiledir
