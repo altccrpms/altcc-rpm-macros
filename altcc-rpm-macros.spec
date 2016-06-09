@@ -1,6 +1,8 @@
+%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+
 Name:           altcc-rpm-macros
 Version:        3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        AltCCRPMs rpm macros
 URL:            https://github.com/altccrpms/altcc-rpm-macros
 
@@ -18,15 +20,19 @@ This package contains the RPM macros for the AltCCRPMs project.
 %build
 
 %install
-mkdir -p %{buildroot}/%{_rpmconfigdir}/macros.d/
-install -pm 644 macros.altcc %{buildroot}/%{_rpmconfigdir}/macros.d/
+mkdir -p %{buildroot}%{macrosdir}
+install -pm 644 macros.altcc %{buildroot}%{macrosdir}
 
 %files
+%{!?_licensedir:%global license %doc}
 %license LICENSE
 %doc README.md
-%{_rpmconfigdir}/macros.d/macros.altcc
+%{macrosdir}/macros.altcc
 
 %changelog
+* Thu Jun 9 2016 Orion Poplawski <orion@cora.nwra.com> - 3-2
+- Handle EL6 rpm macros dir
+
 * Fri Jun 3 2016 Orion Poplawski <orion@cora.nwra.com> - 3-1
 - Add handling of %%doc and %%license
 - Automatically own parent directories
