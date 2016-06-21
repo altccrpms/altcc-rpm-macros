@@ -65,3 +65,6 @@ True if buildwith with MPI, false if not.
 
 ## altcc_cc_name
 Same as $COMPILER_NAME
+
+## altcc_mpi_name
+Same as $MPI_NAME
