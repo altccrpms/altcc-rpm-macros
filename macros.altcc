@@ -47,6 +47,7 @@
       end
     else
       rpm.define("altcc_with_mpi 1")
+      rpm.define("altcc_mpi_name "..altcc_mpi_name)
       altcc_mpi_version = os.getenv("MPI_VERSION")
       altcc_mpi_name_ver = altcc_mpi_name.."-"..altcc_mpi_version
       altcc_name_suffix = "-"..altcc_cc_name.."-"..altcc_mpi_name

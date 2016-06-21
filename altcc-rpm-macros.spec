@@ -1,8 +1,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           altcc-rpm-macros
-Version:        3
-Release:        2%{?dist}
+Version:        4
+Release:        1%{?dist}
 Summary:        AltCCRPMs rpm macros
 URL:            https://github.com/altccrpms/altcc-rpm-macros
 
@@ -30,6 +30,9 @@ install -pm 644 macros.altcc %{buildroot}%{macrosdir}
 %{macrosdir}/macros.altcc
 
 %changelog
+* Tue Jun 21 2016 Orion Poplawski <orion@cora.nwra.com> - 4-1
+- Define altcc_mpi_name
+
 * Thu Jun 9 2016 Orion Poplawski <orion@cora.nwra.com> - 3-2
 - Handle EL6 rpm macros dir
 
