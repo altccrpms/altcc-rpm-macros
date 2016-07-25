@@ -126,7 +126,7 @@
 
 # Create the license directory
 %altcc_license() %{lua:
-  if (altcc) then
+  if (altcc and rpm.expand("%{?_licensedir}") ~= "") then
     print("mkdir -p "..rpm.expand("%{buildroot}/%{_licensedir}\\n"))
   end
 }
@@ -150,7 +150,7 @@
   if (rpm.expand("%{-d}") ~= "") then
     args = args.." "..rpm.expand("%{_defaultdocdir}")
   end
-  if (rpm.expand("%{-l}") ~= "") then
+  if (rpm.expand("%{-l}") ~= "" and rpm.expand("%{?_licensedir}") ~= "") then
     args = args.." "..rpm.expand("%{_licensedir}")
   end
   for arg in args:gmatch('%S+') do
