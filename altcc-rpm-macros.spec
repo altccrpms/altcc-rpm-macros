@@ -32,6 +32,7 @@ install -pm 644 macros.altcc %{buildroot}%{macrosdir}
 %changelog
 * Fri Sep 23 2016 Orion Poplawski <orion@cora.nwra.com> - 6-1
 - Add -p option to %%altcc_init to allow installing into a shared prefix dir
+- Have %%altcc_init -m take a version to specify the MPI module path version
 
 * Mon Jul 25 2016 Orion Poplawski <orion@cora.nwra.com> - 5-1
 - Do not try to support %%{_licensedir} if it is not defined (EL6)
