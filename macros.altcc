@@ -36,6 +36,7 @@
     altcc_cc_name = ""
   end
   altcc_modulepath = nil
+  altcc_mpi_version = nil
   if (altcc_cc_name ~= "") then
     altcc = true
     rpm.define("altcc 1")
@@ -123,6 +124,9 @@
   print(rpm.expand("sed -e 's#@PREFIX@#%{_prefix}#g;s#@LIB@#%{_lib}#g;s#@LIBDIR@#%{_libdir}#g;s#@ETCDIR@#%{_sysconfdir}#g;s#@FMODDIR@#%{_libdir}#g;s#@INCDIR@#%{_includedir}#g;s#@MANDIR@#%{_mandir}#g;s#@DATADIR@#%{_datadir}#g;\\n"))
   if (altcc_modulepath ~= nil) then
     print("s#@MODULEPATH@#"..altcc_modulepath.."#;\\n")
+  end
+  if (altcc_mpi_version ~= nil) then
+    print("s#@MPI_VERSION@#"..altcc_mpi_version.."#;\\n")
   end
   print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}"..altcc_modulefiledir.."/%{version}\\n"))
   if (altcc_modulepath ~= nil) then
