@@ -1,7 +1,12 @@
 # Macros for AltCCRPMs
 
 # Initialize AltCCRPMs - called from the start of the spec file
-%altcc_init(n:v:m) %{lua:
+# Options:
+#  -m - Use with MPI Implementations - defines MODULEPATH
+#  -n name - Name of package (or use %{shortname}
+#  -p prefix - Alternate prefix name
+#  -v version - Version of package (or use %{ver})
+%altcc_init(mn:p:v:) %{lua:
   altcc_name = ""
   if (rpm.expand("%{-n}") ~= "") then
     altcc_name = rpm.expand("%{-n*}")
@@ -21,6 +26,11 @@
     print("%altcc_init: ERROR: Need to pass version with -v or define %ver!")
   end
   local name_ver = altcc_name.."-"..version
+  if (rpm.expand("%{-p}") ~= "") then
+    altcc_prefix_dir = rpm.expand("%{-p*}")
+  else
+    altcc_prefix_dir = name_ver
+  end
   altcc_cc_name = os.getenv("COMPILER_NAME")
   if (altcc_cc_name == nil) then
     altcc_cc_name = ""
@@ -39,7 +49,7 @@
       altcc_name_suffix = "-"..altcc_cc_name
       altcc_dep_suffix = "-"..altcc_cc_name_ver
       altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver
-      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_name.."-"..version
+      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_prefix_dir
       altcc_modulefiledir = "/opt/modulefiles/Compiler/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
@@ -53,7 +63,7 @@
       altcc_name_suffix = "-"..altcc_cc_name.."-"..altcc_mpi_name
       altcc_dep_suffix = "-"..altcc_cc_name_ver.."-"..altcc_mpi_name_ver
       altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver.."-"..altcc_mpi_name_ver
-      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..name_ver
+      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..altcc_prefix_dir
       altcc_modulefiledir = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_mpi_name.."/"..altcc_mpi_version.."/"..altcc_name
     end
     rpm.define("altcc_name_suffix "..altcc_name_suffix)
@@ -68,6 +78,8 @@
 }
 
 # Emit version-less provides for easy installation of latest version
+# Options:
+#  -n name - Use alternate name for provides
 %altcc_provide(n:) %{lua:
   if (not altcc) then
     return
