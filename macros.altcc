@@ -2,11 +2,11 @@
 
 # Initialize AltCCRPMs - called from the start of the spec file
 # Options:
-#  -m - Use with MPI Implementations - defines MODULEPATH
+#  -m moduleversion - Use with MPI Implementations - defines MODULEPATH
 #  -n name - Name of package (or use %{shortname}
 #  -p prefix - Alternate prefix name
 #  -v version - Version of package (or use %{ver})
-%altcc_init(mn:p:v:) %{lua:
+%altcc_init(m:n:p:v:) %{lua:
   altcc_name = ""
   if (rpm.expand("%{-n}") ~= "") then
     altcc_name = rpm.expand("%{-n*}")
@@ -53,7 +53,8 @@
       altcc_modulefiledir = "/opt/modulefiles/Compiler/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
-        altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..version
+        altcc_mpi_version = rpm.expand("%{-m*}")
+        altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
       end
     else
       rpm.define("altcc_with_mpi 1")
