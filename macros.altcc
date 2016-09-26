@@ -44,18 +44,25 @@
     altcc_cc_version = os.getenv("COMPILER_VERSION")
     altcc_cc_name_ver = altcc_cc_name.."-"..altcc_cc_version
     rpm.define("altcc_cc_dep_suffix -"..altcc_cc_name_ver)
+    -- If we're instaling into a different prefix, we don't distinguish based
+    -- on this package's version
+    if (rpm.expand("%{-p}") ~= "") then
+      altcc_pkg_suffix = "-"..altcc_cc_name_ver
+    else
+      altcc_pkg_suffix = "-"..version.."-"..altcc_cc_name_ver
+    end
+    altcc_name_suffix = "-"..altcc_cc_name
+    altcc_dep_suffix = "-"..altcc_cc_name_ver
     altcc_mpi_name = os.getenv("MPI_NAME")
     if (altcc_mpi_name == nil or altcc_mpi_name == "") then
       rpm.define("altcc_with_mpi 0")
-      altcc_name_suffix = "-"..altcc_cc_name
-      altcc_dep_suffix = "-"..altcc_cc_name_ver
-      altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver
       altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_prefix_dir
       altcc_modulefiledir = "/opt/modulefiles/Compiler/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
         altcc_mpi_version = rpm.expand("%{-m*}")
         altcc_mpi_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
+        altcc_mpi_suffix = "-"..altcc_mpi_version.."-"..altcc_cc_name_ver
         altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
       end
     else
@@ -63,9 +70,9 @@
       rpm.define("altcc_mpi_name "..altcc_mpi_name)
       altcc_mpi_version = os.getenv("MPI_VERSION")
       altcc_mpi_name_ver = altcc_mpi_name.."-"..altcc_mpi_version
-      altcc_name_suffix = "-"..altcc_cc_name.."-"..altcc_mpi_name
-      altcc_dep_suffix = "-"..altcc_cc_name_ver.."-"..altcc_mpi_name_ver
-      altcc_pkg_suffix = "-"..rpm.expand("%{ver}-")..altcc_cc_name_ver.."-"..altcc_mpi_name_ver
+      altcc_name_suffix = altcc_name_suffix.."-"..altcc_mpi_name
+      altcc_dep_suffix = altcc_dep_suffix.."-"..altcc_mpi_name_ver
+      altcc_pkg_suffix = altcc_pkg_suffix.."-"..altcc_mpi_name_ver
       altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..altcc_prefix_dir
       altcc_modulefiledir = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_mpi_name.."/"..altcc_mpi_version.."/"..altcc_name
     end
@@ -99,6 +106,10 @@
   print("Provides: "..name..altcc_name_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
   print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n")
   print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
+  if (altcc_mpi_version ~= nil) then
+    print("Provides: "..name..altcc_mpi_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n")
+    print("Provides: "..name..altcc_mpi_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
+  end
 }
 
 # Emit the requires on environment(modules) - called from the package that

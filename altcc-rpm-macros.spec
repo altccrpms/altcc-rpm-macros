@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           altcc-rpm-macros
-Version:        7
+Version:        8
 Release:        1%{?dist}
 Summary:        AltCCRPMs rpm macros
 URL:            https://github.com/altccrpms/altcc-rpm-macros
@@ -30,6 +30,10 @@ install -pm 644 macros.altcc %{buildroot}%{macrosdir}
 %{macrosdir}/macros.altcc
 
 %changelog
+* Mon Sep 26 2016 Orion Poplawski <orion@cora.nwra.com> - 8-1
+- Do not add package version to package name if installing into a different prefix
+- Add mpi version provides if using a different version for module path
+
 * Mon Sep 26 2016 Orion Poplawski <orion@cora.nwra.com> - 7-1
 - Create proper MPI modulefiles path
 
