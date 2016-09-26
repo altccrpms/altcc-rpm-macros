@@ -106,7 +106,7 @@
   print("Provides: "..name..altcc_name_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
   print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n")
   print("Provides: "..name..altcc_dep_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
-  if (altcc_mpi_version ~= nil) then
+  if (altcc_mpi_suffix ~= nil) then
     print("Provides: "..name..altcc_mpi_suffix..suffix..rpm.expand(" = %{version}-%{release}").."\\n")
     print("Provides: "..name..altcc_mpi_suffix..suffix..rpm.expand("%{?_isa} = %{version}-%{release}").."\\n")
   end
