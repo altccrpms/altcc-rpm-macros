@@ -55,7 +55,7 @@
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
         altcc_mpi_version = rpm.expand("%{-m*}")
-        altcc_mpi_prefix = "/opt/".altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
+        altcc_mpi_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
         altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
       end
     else
