@@ -7,6 +7,12 @@
 #  -p prefix - Alternate prefix name
 #  -v version - Version of package (or use %{ver})
 %altcc_init(m:n:p:v:) %{lua:
+  -- Global parameters
+  altcc_path_prefix = "/opt"
+  altcc_modulefiles_path = altcc_path_prefix.."/modulefiles"
+  altcc_compiler_modulefiles_path = altcc_modulefiles_path.."/Compiler"
+  altcc_mpi_modulefiles_path = altcc_modulefiles_path.."/MPI"
+  -- Handle arguments
   altcc_name = ""
   if (rpm.expand("%{-n}") ~= "") then
     altcc_name = rpm.expand("%{-n*}")
@@ -31,6 +37,7 @@
   else
     altcc_prefix_dir = name_ver
   end
+  -- Set environment and macros
   altcc_cc_name = os.getenv("COMPILER_NAME")
   if (altcc_cc_name == nil) then
     altcc_cc_name = ""
@@ -43,8 +50,9 @@
     rpm.define("altcc_cc_name "..altcc_cc_name)
     altcc_cc_version = os.getenv("COMPILER_VERSION")
     altcc_cc_name_ver = altcc_cc_name.."-"..altcc_cc_version
+    -- altcc_cc_dep_suffix is used for non-MPI deps in an MPI package
     rpm.define("altcc_cc_dep_suffix -"..altcc_cc_name_ver)
-    -- If we're instaling into a different prefix, we don't distinguish based
+    -- If we are instaling into a different prefix, we do not distinguish based
     -- on this package's version
     if (rpm.expand("%{-p}") ~= "") then
       altcc_pkg_suffix = "-"..altcc_cc_name_ver
@@ -56,14 +64,14 @@
     altcc_mpi_name = os.getenv("MPI_NAME")
     if (altcc_mpi_name == nil or altcc_mpi_name == "") then
       rpm.define("altcc_with_mpi 0")
-      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_prefix_dir
-      altcc_modulefiledir = "/opt/modulefiles/Compiler/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name
+      altcc_prefix = altcc_path_prefix.."/"..altcc_cc_name_ver.."/"..altcc_prefix_dir
+      altcc_modulefiledir = altcc_compiler_modulefiles_path.."/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
         altcc_mpi_version = rpm.expand("%{-m*}")
-        altcc_mpi_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
+        altcc_mpi_prefix = altcc_path_prefix.."/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
         altcc_mpi_suffix = "-"..altcc_mpi_version.."-"..altcc_cc_name_ver
-        altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
+        altcc_modulepath = altcc_mpi_modulefiles_path.."/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
       end
     else
       rpm.define("altcc_with_mpi 1")
@@ -73,8 +81,8 @@
       altcc_name_suffix = altcc_name_suffix.."-"..altcc_mpi_name
       altcc_dep_suffix = altcc_dep_suffix.."-"..altcc_mpi_name_ver
       altcc_pkg_suffix = altcc_pkg_suffix.."-"..altcc_mpi_name_ver
-      altcc_prefix = "/opt/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..altcc_prefix_dir
-      altcc_modulefiledir = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_mpi_name.."/"..altcc_mpi_version.."/"..altcc_name
+      altcc_prefix = altcc_path_prefix.."/"..altcc_cc_name_ver.."/"..altcc_mpi_name_ver.."/"..altcc_prefix_dir
+      altcc_modulefiledir = altcc_mpi_modulefiles_path.."/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_mpi_name.."/"..altcc_mpi_version.."/"..altcc_name
     end
     rpm.define("altcc_name_suffix "..altcc_name_suffix)
     rpm.define("altcc_dep_suffix "..altcc_dep_suffix)
@@ -203,7 +211,7 @@
   if (rpm.expand("%{-m}") ~= "") then
     print(altcc_modulefiledir.."\\n")
     if (altcc_modulepath ~= nil) then
-      print("/opt/modulefiles/MPI\\n")
+      print(altcc_mpi_modulefiles_path.."\\n")
       print(altcc_mpi_prefix.."\\n")
     end
   end
