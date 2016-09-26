@@ -55,6 +55,7 @@
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
         altcc_mpi_version = rpm.expand("%{-m*}")
+        altcc_mpi_prefix = "/opt/".altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
         altcc_modulepath = "/opt/modulefiles/MPI/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
       end
     else
@@ -131,6 +132,7 @@
   print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}"..altcc_modulefiledir.."/%{version}\\n"))
   if (altcc_modulepath ~= nil) then
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath.."\\n")
+    print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_mpi_prefix.."\\n")
   end
 }
 
@@ -191,6 +193,7 @@
     print(altcc_modulefiledir.."\\n")
     if (altcc_modulepath ~= nil) then
       print("/opt/modulefiles/MPI\\n")
+      print(altcc_mpi_prefix.."\n")
     end
   end
 }
