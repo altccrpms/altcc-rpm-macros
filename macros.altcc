@@ -193,7 +193,7 @@
     print(altcc_modulefiledir.."\\n")
     if (altcc_modulepath ~= nil) then
       print("/opt/modulefiles/MPI\\n")
-      print(altcc_mpi_prefix.."\n")
+      print(altcc_mpi_prefix.."\\n")
     end
   end
 }
