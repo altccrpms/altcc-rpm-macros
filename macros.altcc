@@ -6,7 +6,8 @@
 #  -n name - Name of package (or use %{shortname}
 #  -p prefix - Alternate prefix name
 #  -v version - Version of package (or use %{ver})
-%altcc_init(m:n:p:v:) %{lua:
+#  -f - Use full compiler version for package name/prefix
+%altcc_init(fm:n:p:v:) %{lua:
   -- Global parameters
   altcc_path_prefix = "/opt"
   altcc_modulefiles_path = altcc_path_prefix.."/modulefiles"
@@ -48,7 +49,11 @@
     altcc = true
     rpm.define("altcc 1")
     rpm.define("altcc_cc_name "..altcc_cc_name)
-    altcc_cc_version = os.getenv("COMPILER_VERSION")
+    if (rpm.expand("%{-f}") ~= "") then
+      altcc_cc_version = os.getenv("COMPILER_VERSION_FULL")
+    else
+      altcc_cc_version = os.getenv("COMPILER_VERSION")
+    end
     altcc_cc_name_ver = altcc_cc_name.."-"..altcc_cc_version
     -- altcc_cc_dep_suffix is used for non-MPI deps in an MPI package
     rpm.define("altcc_cc_dep_suffix -"..altcc_cc_name_ver)
