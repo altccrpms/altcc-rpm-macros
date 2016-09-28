@@ -7,7 +7,8 @@
 #  -p prefix - Alternate prefix name
 #  -v version - Version of package (or use %{ver})
 #  -f - Use full compiler version for package name/prefix
-%altcc_init(fm:n:p:v:) %{lua:
+#  -F - Use full MPI version for package name/prefix
+%altcc_init(fFm:n:p:v:) %{lua:
   -- Global parameters
   altcc_path_prefix = "/opt"
   altcc_modulefiles_path = altcc_path_prefix.."/modulefiles"
@@ -74,14 +75,21 @@
       -- If we are an MPI implementation
       if (rpm.expand("%{-m}") ~= "") then
         altcc_mpi_version = rpm.expand("%{-m*}")
+        altcc_mpi_version_full = version
         altcc_mpi_prefix = altcc_path_prefix.."/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version
+        altcc_mpi_prefix_full = altcc_path_prefix.."/"..altcc_cc_name_ver.."/"..altcc_name.."-"..altcc_mpi_version_full
         altcc_mpi_suffix = "-"..altcc_mpi_version.."-"..altcc_cc_name_ver
         altcc_modulepath = altcc_mpi_modulefiles_path.."/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version
+        altcc_modulepath_full = altcc_mpi_modulefiles_path.."/"..altcc_cc_name.."/"..altcc_cc_version.."/"..altcc_name.."/"..altcc_mpi_version_full
       end
     else
       rpm.define("altcc_with_mpi 1")
       rpm.define("altcc_mpi_name "..altcc_mpi_name)
-      altcc_mpi_version = os.getenv("MPI_VERSION")
+      if (rpm.expand("%{-F}") ~= "") then
+        altcc_mpi_version = os.getenv("MPI_VERSION_FULL")
+      else
+        altcc_mpi_version = os.getenv("MPI_VERSION")
+      end
       altcc_mpi_name_ver = altcc_mpi_name.."-"..altcc_mpi_version
       altcc_name_suffix = altcc_name_suffix.."-"..altcc_mpi_name
       altcc_dep_suffix = altcc_dep_suffix.."-"..altcc_mpi_name_ver
@@ -148,7 +156,11 @@
   print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulefiledir.."\\n")
   print(rpm.expand("sed -e 's#@PREFIX@#%{_prefix}#g;s#@LIB@#%{_lib}#g;s#@LIBDIR@#%{_libdir}#g;s#@ETCDIR@#%{_sysconfdir}#g;s#@FMODDIR@#%{_libdir}#g;s#@INCDIR@#%{_includedir}#g;s#@MANDIR@#%{_mandir}#g;s#@DATADIR@#%{_datadir}#g;\\n"))
   if (altcc_modulepath ~= nil) then
-    print("s#@MODULEPATH@#"..altcc_modulepath.."#;\\n")
+    if (altcc_modulepath ~= altcc_modulepath_full) then
+      print("s#@MODULEPATH@#"..altcc_modulepath_full..":"..altcc_modulepath.."#;\\n")
+    else
+      print("s#@MODULEPATH@#"..altcc_modulepath.."#;\\n")
+    end
   end
   if (altcc_mpi_version ~= nil) then
     print("s#@MPI_VERSION@#"..altcc_mpi_version.."#;\\n")
@@ -157,6 +169,10 @@
   if (altcc_modulepath ~= nil) then
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath.."\\n")
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_mpi_prefix.."\\n")
+    if (altcc_modulepath ~= altcc_modulepath_full) then
+      print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath_full.."\\n")
+      print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_mpi_prefix_full.."\\n")
+    end
   end
 }
 
@@ -218,6 +234,9 @@
     if (altcc_modulepath ~= nil) then
       print(altcc_mpi_modulefiles_path.."\\n")
       print(altcc_mpi_prefix.."\\n")
+      if (altcc_modulepath ~= altcc_modulepath_full) then
+        print(altcc_mpi_prefix_full.."\\n")
+      end
     end
   end
 }
