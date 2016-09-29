@@ -154,7 +154,7 @@
     return
   end
   print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulefiledir.."\\n")
-  print(rpm.expand("sed -e 's#@PREFIX@#%{_prefix}#g;s#@LIB@#%{_lib}#g;s#@LIBDIR@#%{_libdir}#g;s#@ETCDIR@#%{_sysconfdir}#g;s#@FMODDIR@#%{_libdir}#g;s#@INCDIR@#%{_includedir}#g;s#@MANDIR@#%{_mandir}#g;s#@DATADIR@#%{_datadir}#g;\\n"))
+  print(rpm.expand("sed -e 's#@NAME@#"..altcc_name.."#g;s#@NAME_UC@#"..string.upper(altcc_name).."#g;s#@PREFIX@#%{_prefix}#g;s#@LIB@#%{_lib}#g;s#@LIBDIR@#%{_libdir}#g;s#@ETCDIR@#%{_sysconfdir}#g;s#@FMODDIR@#%{_libdir}#g;s#@INCDIR@#%{_includedir}#g;s#@MANDIR@#%{_mandir}#g;s#@DATADIR@#%{_datadir}#g;\\n"))
   if (altcc_modulepath ~= nil) then
     if (altcc_modulepath ~= altcc_modulepath_full) then
       print("s#@MODULEPATH@#"..altcc_modulepath_full..":"..altcc_modulepath.."#;\\n")
