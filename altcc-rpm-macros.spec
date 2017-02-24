@@ -1,7 +1,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:           altcc-rpm-macros
-Version:        11
+Version:        12
 Release:        1%{?dist}
 Summary:        AltCCRPMs rpm macros
 URL:            https://github.com/altccrpms/altcc-rpm-macros
@@ -30,6 +30,10 @@ install -pm 644 macros.altcc %{buildroot}%{macrosdir}
 %{macrosdir}/macros.altcc
 
 %changelog
+* Fri Feb 24 2017 Orion Poplawski <orion@cora.nwra.com> - 12-1
+- Use %%dir for extra MPI implementation paths to own
+- Fix conditionals for owning alternative mpi prefixes
+
 * Thu Sep 29 2016 Orion Poplawski <orion@cora.nwra.com> - 11-1
 - Substitute @NAME@ and @NAME_UC@ in modulefiles
 

@@ -232,10 +232,13 @@
   if (rpm.expand("%{-m}") ~= "") then
     print(altcc_modulefiledir.."\\n")
     if (altcc_modulepath ~= nil) then
-      print(altcc_mpi_modulefiles_path.."\\n")
-      print(altcc_mpi_prefix.."\\n")
-      if (altcc_modulepath ~= altcc_modulepath_full) then
-        print(altcc_mpi_prefix_full.."\\n")
+      -- We are an MPI implementation, own directories that other packages will install into
+      print("%dir "..altcc_mpi_modulefiles_path.."\\n")
+      if (altcc_prefix ~= altcc_mpi_prefix) then
+        print("%dir "..altcc_mpi_prefix.."\\n")
+      end
+      if (altcc_prefix ~= altcc_mpi_prefix_full) then
+        print("%dir "..altcc_mpi_prefix_full.."\\n")
       end
     end
   end
