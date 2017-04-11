@@ -6,9 +6,10 @@
 #  -n name - Name of package (or use %{shortname}
 #  -p prefix - Alternate prefix name
 #  -v version - Version of package (or use %{ver})
+#  -V version - Version of modulefile (defaults to %{version})
 #  -f - Use full compiler version for package name/prefix
 #  -F - Use full MPI version for package name/prefix
-%altcc_init(fFm:n:p:v:) %{lua:
+%altcc_init(fFm:n:p:v:V:) %{lua:
   -- Global parameters
   altcc_path_prefix = "/opt"
   altcc_modulefiles_path = altcc_path_prefix.."/modulefiles"
@@ -34,6 +35,11 @@
     print("%altcc_init: ERROR: Need to pass version with -v or define %ver!")
   end
   local name_ver = altcc_name.."-"..version
+  if (rpm.expand("%{-V}") ~= "") then
+    altcc_modulefile_version = rpm.expand("%{-V*}")
+  else
+    altcc_modulefile_version = rpm.expand("%{version}")
+  end
   if (rpm.expand("%{-p}") ~= "") then
     altcc_prefix_dir = rpm.expand("%{-p*}")
   else
@@ -165,7 +171,7 @@
   if (altcc_mpi_version ~= nil) then
     print("s#@MPI_VERSION@#"..altcc_mpi_version.."#;\\n")
   end
-  print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}"..altcc_modulefiledir.."/%{version}\\n"))
+  print(rpm.expand("s#@PY2SITEARCH@#%{_libdir}/python%{python2_version}/site-packages#;s#@PY3SITEARCH@#%{_libdir}/python%{python3_version}/site-packages#;s#@COMPILER@#openmpi-"..altcc_cc_name.."#g;s#@SUFFIX@#-"..altcc_name.."_openmpi#g' < %{1} > %{buildroot}"..altcc_modulefiledir.."/"..altcc_modulefile_version.."\\n"))
   if (altcc_modulepath ~= nil) then
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_modulepath.."\\n")
     print("mkdir -p "..rpm.expand("%{buildroot}")..altcc_mpi_prefix.."\\n")
