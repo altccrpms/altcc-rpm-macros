@@ -13,6 +13,12 @@ or
 %global ver <version>
 %{?altcc_init}
 ```
+### Options:
+-  -p prefix - Alternate prefix name
+-  -v version - Version of package (or use %{ver})
+-  -V version - Version of modulefile (defaults to %{version})
+-  -f - Use full compiler version for package name/prefix
+-  -F - Use full MPI version for package name/prefix
 
 ## altcc_pkg_suffix
 Expands to a suffix containing the version of the main package, the name and version of the compiler, and the name and version of the MPI library used if applicable.  Add %{?altcc_pkg_suffix} to Name.
